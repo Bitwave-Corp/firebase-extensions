@@ -21,7 +21,7 @@ async function processCollectionGroup(config: CliConfig): Promise<number> {
   try {
     const maxWorkers = Math.ceil(cpus().length / 2);
     // const maxWorkers = 1;
-    const maxMem = `--max-old-space-size=8000`; //4096
+    const maxMem = `--max-old-space-size=16000`; //4096
     const workerPool = pool(__dirname + "/worker.js", {
       maxWorkers,
       forkOpts: {
@@ -62,7 +62,7 @@ async function processCollectionGroup(config: CliConfig): Promise<number> {
       partitions++;
 
       const query = partition.toQuery();
-      
+
       const serializedQuery = {
         startAt: query._queryOptions.startAt,
         endAt: query._queryOptions.endAt,
