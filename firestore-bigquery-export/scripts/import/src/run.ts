@@ -18,7 +18,7 @@ import {
  */
 async function processCollectionGroup(config: CliConfig): Promise<number> {
   try {
-    console.log(process.memoryUsage());
+    console.log('HEAP: ' + process.memoryUsage().heapTotal);
 
     const maxWorkers = Math.ceil(cpus().length / 2);
     // const maxWorkers = 1;
