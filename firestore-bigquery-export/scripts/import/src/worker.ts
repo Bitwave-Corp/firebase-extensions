@@ -14,6 +14,9 @@ async function processDocuments(
   config: CliConfig
 ) {
   try {
+    // process.memoryUsage();
+    console.log(process.memoryUsage());
+
     const {
       sourceCollectionPath,
       projectId,

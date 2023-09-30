@@ -18,6 +18,8 @@ import {
  */
 async function processCollectionGroup(config: CliConfig): Promise<number> {
   try {
+    console.log(process.memoryUsage());
+
     const maxWorkers = Math.ceil(cpus().length / 2);
     // const maxWorkers = 1;
     const maxMem = `--max-old-space-size=50000`; //4096
