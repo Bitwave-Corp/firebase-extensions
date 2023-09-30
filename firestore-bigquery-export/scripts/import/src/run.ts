@@ -62,14 +62,13 @@ async function processCollectionGroup(config: CliConfig): Promise<number> {
       partitions++;
 
       const query = partition.toQuery();
-
-      const serializedQuery = {"startAt":{"before":true,"values":[{"referenceValue":"projects/bitalpha-001/databases/(default)/documents/organizations/1CvlqFOs78VsK2BjHEMr/transactions/IMX.46427395.royalty.none.0","valueType":"referenceValue"}]},"endAt":{"before":true,"values":[{"referenceValue":"projects/bitalpha-001/databases/(default)/documents/organizations/1CvlqFOs78VsK2BjHEMr/transactions/IMX.66995063.royalty.none.0","valueType":"referenceValue"}]}}
-      // const serializedQuery = {
-      //   startAt: query._queryOptions.startAt,
-      //   endAt: query._queryOptions.endAt,
-      //   limit: query._queryOptions.limit,
-      //   offset: query._queryOptions.offset,
-      // };
+      
+      const serializedQuery = {
+        startAt: query._queryOptions.startAt,
+        endAt: query._queryOptions.endAt,
+        limit: query._queryOptions.limit,
+        offset: query._queryOptions.offset,
+      };
 
       workerPool
           .exec("processDocuments", [serializedQuery, config])
