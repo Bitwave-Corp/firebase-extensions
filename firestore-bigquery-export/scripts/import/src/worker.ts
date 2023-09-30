@@ -15,7 +15,7 @@ async function processDocuments(
 ) {
   try {
     // process.memoryUsage();
-    console.log('HEAP: ' + process.memoryUsage().heapTotal);
+    console.log('HEAP Inner: ' + process.memoryUsage().heapTotal);
 
     const {
       sourceCollectionPath,
