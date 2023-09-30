@@ -12,17 +12,16 @@ import {
   FirestoreBigQueryEventHistoryTracker,
   FirestoreDocumentChangeEvent,
 } from "@firebaseextensions/firestore-bigquery-change-tracker";
+import * as v8 from "v8";
 
 /**
  * Import data from a collection group in parallel using workers.
  */
 async function processCollectionGroup(config: CliConfig): Promise<number> {
   try {
-    console.log('HEAP: ' + process.memoryUsage().heapTotal);
-
     const maxWorkers = Math.ceil(cpus().length / 2);
     // const maxWorkers = 1;
-    const maxMem = `--max-old-space-size=50000`; //4096
+    const maxMem = `--max-old-space-size=8000`; //4096
     const workerPool = pool(__dirname + "/worker.js", {
       maxWorkers,
       forkOpts: {
@@ -64,12 +63,13 @@ async function processCollectionGroup(config: CliConfig): Promise<number> {
 
       const query = partition.toQuery();
 
-      const serializedQuery = {
-        startAt: query._queryOptions.startAt,
-        endAt: query._queryOptions.endAt,
-        limit: query._queryOptions.limit,
-        offset: query._queryOptions.offset,
-      };
+      const serializedQuery = {"startAt":{"before":true,"values":[{"referenceValue":"projects/bitalpha-001/databases/(default)/documents/organizations/1CvlqFOs78VsK2BjHEMr/transactions/IMX.46427395.royalty.none.0","valueType":"referenceValue"}]},"endAt":{"before":true,"values":[{"referenceValue":"projects/bitalpha-001/databases/(default)/documents/organizations/1CvlqFOs78VsK2BjHEMr/transactions/IMX.66995063.royalty.none.0","valueType":"referenceValue"}]}}
+      // const serializedQuery = {
+      //   startAt: query._queryOptions.startAt,
+      //   endAt: query._queryOptions.endAt,
+      //   limit: query._queryOptions.limit,
+      //   offset: query._queryOptions.offset,
+      // };
 
       workerPool
           .exec("processDocuments", [serializedQuery, config])

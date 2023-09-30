@@ -8,15 +8,39 @@ import {
   FirestoreDocumentChangeEvent,
 } from "@firebaseextensions/firestore-bigquery-change-tracker";
 import * as _ from "lodash";
+import * as v8 from "v8";
+
+const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`;
+
 
 async function processDocuments(
   serializableQuery: SerializableQuery,
   config: CliConfig
 ) {
-  try {
-    // process.memoryUsage();
-    console.log('HEAP Inner: ' + process.memoryUsage().heapTotal);
+  async function recordRows(tableId: string, datasetId: string, datasetLocation: string, chunk: any, projectId: string) {
+    const dataSink = new FirestoreBigQueryEventHistoryTracker({
+      tableId,
+      datasetId,
+      datasetLocation,
+    });
 
+
+    const rows: FirestoreDocumentChangeEvent = chunk.map((document) => {
+      return {
+        timestamp: new Date().toISOString(),
+        operation: ChangeType.IMPORT,
+        documentName: `projects/${projectId}/databases/(default)/documents/${document.ref.path}`,
+        documentId: document.id,
+        eventId: "",
+        data: document.data(),
+      };
+    });
+
+    await dataSink.record(rows);
+    return rows;
+  }
+
+  try {
     const {
       sourceCollectionPath,
       projectId,
@@ -51,34 +75,19 @@ async function processDocuments(
         }`
     );
 
-    const dataSink = new FirestoreBigQueryEventHistoryTracker({
-      tableId,
-      datasetId,
-      datasetLocation,
-    });
 
     const chunks = _.chunk(docs, config.batchSize);
 
     let total = 0;
 
     for(const chunk of chunks) {
-      const rows: FirestoreDocumentChangeEvent = chunk.map((document) => {
-        return {
-          timestamp: new Date().toISOString(),
-          operation: ChangeType.IMPORT,
-          documentName: `projects/${projectId}/databases/(default)/documents/${document.ref.path}`,
-          documentId: document.id,
-          eventId: "",
-          data: document.data(),
-        };
-      });
-
-      await dataSink.record(rows);
+      const rows = await recordRows(tableId, datasetId, datasetLocation, chunk, projectId);
       total += rows.length
     }
 
     return total;
   } catch (e) {
+    console.log('Problem inserting: ', e);
     throw e;
   }
 }
