@@ -229,7 +229,7 @@ export async function parseConfig(): Promise<CliConfig | CliConfigError> {
     sourceCollectionPath: sourceCollectionPath,
     datasetId: dataset,
     tableId: table,
-    batchSize: batchSize,
+    batchSize: (typeof batchSize === 'string') ? Number.parseInt(batchSize) : batchSize,
     queryCollectionGroup: queryCollectionGroup,
     datasetLocation: datasetLocation,
     multiThreaded: multiThreaded,

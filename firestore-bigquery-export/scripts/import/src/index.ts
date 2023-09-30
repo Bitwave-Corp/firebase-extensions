@@ -41,6 +41,10 @@ const FIRESTORE_DEFAULT_DATABASE = "(default)";
 
 const packageJson = require("../package.json");
 
+// process.on('uncaughtException', e => {
+//   console.log('Unhandled: ', e);
+// })
+
 program
   .name("fs-bq-import-collection")
   .description(packageJson.description)
